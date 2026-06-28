@@ -178,6 +178,8 @@ docker compose -f docker-compose.test.yml up -d
 docker compose -f docker-compose.test.yml down
 ```
 
+**Continuous Integration:** every push and pull request automatically runs the full test suite via GitHub Actions (`.github/workflows/ci.yml`), against a real Redis service container — not a mock, same principle as the integration tests themselves. This is intentionally CI without CD: the AWS deployment phase of this project was a deliberate short-lived demo (provision, prove the distributed-delivery claim, capture evidence, terminate), not a standing deployment, so automating deploys on every push wasn't the right fit — see [Design Decisions](#design-decisions).
+
 ## Design Decisions
 
 **Why Redis Pub/Sub instead of a message queue (Kafka, RabbitMQ)?**
@@ -191,6 +193,9 @@ STOMP gives topic-based subscriptions (`/topics/{topic}`) and a structured frame
 
 **Why Docker Compose for the AWS topology instead of ECS, EKS, or an Auto Scaling Group?**
 The goal of the AWS phase was specifically to validate "multiple EC2 instances behind a load balancer" as a literal, true claim — not to build a production-grade orchestration setup. Four EC2 instances running the same Docker images used locally, with Nginx as the load balancer, directly and minimally proves that claim. A real production deployment would likely use ECS or an Auto Scaling Group with an Application Load Balancer; that's a reasonable next iteration, not something this phase needed in order to be honest.
+
+**Why CI but not CD?**
+Every push and pull request runs the full test suite automatically via GitHub Actions — that's real, ongoing value with no downside. Automated *deployment* on every push was deliberately not added: the AWS EC2 phase of this project is a short-lived demo by design (provision, prove the distributed claim, capture evidence, terminate), not a standing deployment, specifically to avoid ongoing infrastructure cost for a portfolio project. Automating deploys on every push would force a choice between always-on AWS infrastructure (cost, with no one actually using it) or a spin-up/spin-down deploy workflow on every commit (slow, and not representative of how this project is actually meant to be demoed). CI was the right automation to add; CD, for this project's actual goals, was not.
 
 ## Known Limitations
 

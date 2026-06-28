@@ -5,11 +5,17 @@
 # collide with a manually-running `./gradlew bootRun` on 8080, and multiple
 # test classes can run without port conflicts.
 #
-# spring.data.redis.port: 6380 -> points at the Redis container started via
+# spring.data.redis.port -> points at the Redis container started via
 # `docker compose -f docker-compose.test.yml up -d` (see AbstractIntegrationTest
 # for why this is a fixed externally-managed container rather than
 # Testcontainers-managed). Deliberately different from your manual dev Redis
 # on 6379 so test runs never silently read/write your manual-testing data.
+#
+# Overridable via SPRING_DATA_REDIS_HOST / SPRING_DATA_REDIS_PORT env vars -
+# CI (.github/workflows/ci.yml) uses GitHub Actions' Redis service container
+# on the default port 6379 instead, since spinning up a second Redis on a
+# non-default port isn't necessary in an ephemeral CI runner the way it is
+# on a developer's machine that might have its own Redis already running.
 server:
   port: 0
   tomcat:
@@ -27,5 +33,5 @@ notification:
 spring:
   data:
     redis:
-      host: localhost
-      port: 6380
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6380}
