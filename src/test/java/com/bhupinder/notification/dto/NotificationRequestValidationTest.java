@@ -98,16 +98,27 @@ class NotificationRequestValidationTest {
     }
 
     @Test
-    void veryLongMessagePassesValidation() {
-        // No @Size constraint exists on message - documents that there is
-        // currently NO upper bound enforced at the validation layer. Worth
-        // knowing for the README's limitations section: a malicious or
-        // buggy client could send an arbitrarily large message today.
-        String longMessage = "x".repeat(50_000);
-        NotificationRequest request = new NotificationRequest("user-1", longMessage);
+    void messageAtMaxLengthPassesValidation() {
+        // Exactly at the 10,000 character limit - should pass
+        String maxMessage = "x".repeat(10_000);
+        NotificationRequest request = new NotificationRequest("user-1", maxMessage);
         Set<ConstraintViolation<NotificationRequest>> violations = validator.validate(request);
         assertThat(violations).isEmpty();
     }
+
+    @Test
+    void messageExceedingMaxLengthIsRejected() {
+        // One character over the limit - should fail
+        // Fixes the documented limitation: previously no upper bound was enforced,
+        // allowing arbitrarily large payloads that could exhaust Redis memory.
+        String tooLongMessage = "x".repeat(10_001);
+        NotificationRequest request = new NotificationRequest("user-1", tooLongMessage);
+        Set<ConstraintViolation<NotificationRequest>> violations = validator.validate(request);
+        assertThat(violations).hasSize(1);
+        assertThat(violations.iterator().next().getMessage())
+                .isEqualTo("message must not exceed 10000 characters");
+    }
+    
 
     @Test
     void messageWithSpecialCharactersPassesValidation() {

@@ -1,6 +1,7 @@
 package com.bhupinder.notification.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * Request body for POST /api/notify.
@@ -15,6 +16,7 @@ public record NotificationRequest(
         String topic,
 
         @NotBlank(message = "message must not be blank")
+        @Size(max = 10_000, message = "message must not exceed 10000 characters")
         String message
 ) {
 }
