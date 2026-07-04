@@ -4,6 +4,7 @@ A distributed real-time messaging service built with **Java, Spring Boot, WebSoc
 
 This project was rebuilt from scratch specifically so that every claim about it is independently verifiable: every architectural decision below is backed by a real test, a real measurement, or a real deployment — not a description of what the system is *supposed* to do.
 
+
 ## Table of Contents
 
 - [Architecture](#architecture)
@@ -216,5 +217,4 @@ Documented explicitly rather than left for someone to discover and wonder whethe
 - **Testing:** JUnit 5, Mockito, AssertJ, Awaitility, a hand-built `WebSocketStompClient`-based test harness
 - **Infrastructure:** Docker, Docker Compose, Nginx (WebSocket-aware reverse proxy/load balancer), AWS EC2
 - **Build:** Gradle
-- Tested the PR Request With PRpilot
 ---
